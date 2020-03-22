@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -18,6 +19,10 @@ public class ConnectFour extends Application {
     private double mouseX = 0;
     private double mouseY = 0;
     private EnumSelection currentPlayer;
+
+    private void displayWin(EnumSelection player) {
+        AlertBox.showAlert("Game over", "The " + currentPlayer.toString().toLowerCase() + " player wins.");
+    }
 
     private void drawGrid() {
         graphics.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
@@ -58,6 +63,10 @@ public class ConnectFour extends Application {
         }
         if (cellY >= 0) {
             selections[cellX][cellY] = currentPlayer;
+            if(checkForWin(currentPlayer)) {
+                drawGrid();
+                displayWin(currentPlayer);
+            }
             currentPlayer = (currentPlayer == EnumSelection.RED ? EnumSelection.YELLOW : EnumSelection.RED);
             drawGrid();
         } else {
@@ -69,6 +78,38 @@ public class ConnectFour extends Application {
         mouseX = e.getX();
         mouseY = e.getY();
         drawGrid();
+    }
+
+    private boolean checkForWin(EnumSelection player) {
+        // Check horizontal
+        for (int i = 0; i < gridSize - 3; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if (selections[i][j] == player && selections[i + 1][j] == player && selections[i + 2][j] == player && selections[i + 3][j] == player)
+                    return true;
+            }
+        }
+        // Check vertical
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize - 3; j++) {
+                if (selections[i][j] == player && selections[i][j + 1] == player && selections[i][j + 2] == player && selections[i][j + 3] == player)
+                    return true;
+            }
+        }
+        // Check \ diagonally
+        for (int i = 0; i < gridSize - 3; i++) {
+            for (int j = 0; j < gridSize - 3; j++) {
+                if (selections[i][j] == player && selections[i + 1][j + 1] == player && selections[i + 2][j + 2] == player && selections[i + 3][j + 3] == player)
+                    return true;
+            }
+        }
+        // Check / diagonally
+        for (int i = 0; i < gridSize - 3; i++) {
+            for (int j = 3; j < gridSize; j++) {
+                if (selections[i][j] == player && selections[i + 1][j - 1] == player && selections[i + 2][j - 2] == player && selections[i + 3][j - 3] == player)
+                    return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -92,8 +133,6 @@ public class ConnectFour extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-
 
     public static void main(String[] args) {
         Application.launch(args);
